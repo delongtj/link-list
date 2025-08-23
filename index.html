@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create and share collaborative lists without accounts or databases - all data stored in shareable URLs">
+    <title>URLList - Share Lists Without Accounts</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">URLList</h1>
+                    <p class="hero-subtitle">Create collaborative lists that live in shareable URLs - no accounts or databases required.</p>
+                    <button id="create-list-btn" class="cta-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Create New List
+                    </button>
+                </div>
+            </header>
+            
+            <section class="features">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3>URL-Based</h3>
+                        <p>Your entire list lives in the URL - just copy and share the link</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Instant</h3>
+                        <p>No sign-ups, no loading screens - start creating immediately</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤝</div>
+                        <h3>Collaborative</h3>
+                        <p>Anyone with the link can view and edit your list</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- List Page -->
+        <div id="list-page" class="page">
+            <header class="list-header">
+                <div class="list-header-content">
+                    <button id="back-btn" class="icon-button" title="Back to Home">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <input type="text" id="list-title" class="list-title-input" placeholder="My Awesome List" maxlength="100">
+                    <button id="share-btn" class="share-button" title="Copy Share Link">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                            <polyline points="16,6 12,2 8,6"/>
+                            <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                        Share
+                    </button>
+                </div>
+            </header>
+
+            <main class="list-content">
+                <!-- Warning Banner -->
+                <div id="warning-banner" class="warning-banner">
+                    <div class="warning-content">
+                        <div class="warning-header">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-text">
+                                <strong>Important:</strong> This list only exists at this link. If you lose the link, you'll lose access.
+                            </div>
+                            <button id="dismiss-warning" class="dismiss-button" title="Dismiss Warning">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <button id="bookmark-reminder" class="bookmark-button">Copy Link</button>
+                    </div>
+                </div>
+
+                <div class="add-item-section">
+                    <div class="add-item-container">
+                        <input type="text" id="new-item-input" class="add-item-input" placeholder="Add a new item..." maxlength="500">
+                        <button id="add-item-btn" class="add-item-button" title="Add Item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="list-items" id="list-items">
+                    <!-- Items will be dynamically inserted here -->
+                </div>
+
+                <div class="list-footer">
+                    <div class="list-stats">
+                        <span id="items-count">0 items</span>
+                        <span class="separator">•</span>
+                        <span id="completed-count">0 completed</span>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
