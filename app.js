@@ -280,9 +280,12 @@ class URLListApp {
             }
         });
         
-        // Handle connection errors
-        this.listRef.on('disconnect', () => {
-            console.log('Disconnected from Firebase');
+        // Handle connection status
+        const connectedRef = database.ref('.info/connected');
+        connectedRef.on('value', (snapshot) => {
+            if (snapshot.val() === false) {
+                console.log('Disconnected from Firebase');
+            }
         });
     }
     
