@@ -1,16 +1,23 @@
 // Firebase Configuration from environment variables
 const firebaseConfig = {
-    apiKey: window.FIREBASE_CONFIG?.apiKey || "demo-api-key",
-    authDomain: window.FIREBASE_CONFIG?.authDomain || "demo-project.firebaseapp.com",
-    databaseURL: window.FIREBASE_CONFIG?.databaseURL || "https://demo-project-default-rtdb.firebaseio.com/",
-    projectId: window.FIREBASE_CONFIG?.projectId || "demo-project",
-    storageBucket: window.FIREBASE_CONFIG?.storageBucket || "demo-project.appspot.com",
-    messagingSenderId: window.FIREBASE_CONFIG?.messagingSenderId || "123456789",
-    appId: window.FIREBASE_CONFIG?.appId || "demo-app-id"
+    apiKey: window.FIREBASE_CONFIG?.apiKey,
+    authDomain: window.FIREBASE_CONFIG?.authDomain,
+    databaseURL: window.FIREBASE_CONFIG?.databaseURL,
+    projectId: window.FIREBASE_CONFIG?.projectId,
+    storageBucket: window.FIREBASE_CONFIG?.storageBucket,
+    messagingSenderId: window.FIREBASE_CONFIG?.messagingSenderId,
+    appId: window.FIREBASE_CONFIG?.appId
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase with error handling
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+    console.error('Firebase configuration missing! Check that firebase-config.js loaded properly.');
+    console.error('Config received:', firebaseConfig);
+} else {
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase initialized successfully with project:', firebaseConfig.projectId);
+}
+
 const database = firebase.database();
 
 class URLListApp {

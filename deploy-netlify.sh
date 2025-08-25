@@ -5,6 +5,19 @@
 
 echo "🔥 Injecting Firebase configuration..."
 
+# Debug: Check if environment variables are set
+echo "DEBUG: Checking environment variables..."
+echo "FIREBASE_API_KEY: ${FIREBASE_API_KEY:0:10}..." 
+echo "FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}"
+echo "Environment check complete."
+
+# Verify required environment variables exist
+if [ -z "$FIREBASE_API_KEY" ] || [ -z "$FIREBASE_PROJECT_ID" ]; then
+    echo "❌ ERROR: Missing required Firebase environment variables!"
+    echo "Please set FIREBASE_API_KEY, FIREBASE_PROJECT_ID and other Firebase config in Netlify dashboard."
+    echo "Using fallback configuration for demo purposes..."
+fi
+
 # Create firebase-config.js from environment variables
 cat > firebase-config.js << EOF
 window.FIREBASE_CONFIG = {
