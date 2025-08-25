@@ -197,7 +197,7 @@ class URLListApp {
                 lastModified: Date.now(),
                 version: 1,
                 // TTL: Auto-delete after 1 year of inactivity
-                '.expires': Date.now() + (365 * 24 * 60 * 60 * 1000)
+                expires: Date.now() + (365 * 24 * 60 * 60 * 1000)
             };
             
             try {

@@ -51,7 +51,7 @@
         },
         
         // Auto-delete expired lists (Firebase will handle this)
-        ".expires": {
+        "expires": {
           ".validate": "newData.isNumber()"
         }
       }
