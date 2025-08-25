@@ -874,7 +874,7 @@ class URLListApp {
         
         // Save dismissal state for this session
         sessionStorage.setItem('warning-dismissed', 'true');
-        this.showToast('Remember to bookmark this page!', 'info');
+        this.showToast('Remember to save this link!', 'info');
     }
 
     promptBookmark() {
