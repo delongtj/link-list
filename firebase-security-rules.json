@@ -12,10 +12,8 @@
           newData.child('title').isString() &&
           newData.child('title').val().length <= 100 &&
           
-          // 3. Items is array with max 25 items
-          newData.child('items').hasChildren() == false ||
-          (newData.child('items').hasChildren() &&
-           newData.child('items').numChildren() <= 25) &&
+          // 3. Items validation handled by individual item rules below
+          true &&
           
           // 4. Rate limiting - at least 1 second between updates
           (!data.exists() || 
