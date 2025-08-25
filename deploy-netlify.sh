@@ -15,7 +15,7 @@ echo "Environment check complete."
 if [ -z "$FIREBASE_API_KEY" ] || [ -z "$FIREBASE_PROJECT_ID" ]; then
     echo "❌ ERROR: Missing required Firebase environment variables!"
     echo "Please set FIREBASE_API_KEY, FIREBASE_PROJECT_ID and other Firebase config in Netlify dashboard."
-    echo "Using fallback configuration for demo purposes..."
+    echo "Note: DO NOT declare them in netlify.toml with empty values as this overrides dashboard settings."
 fi
 
 # Create firebase-config.js from environment variables

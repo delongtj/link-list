@@ -2,15 +2,8 @@
   command = "./deploy-netlify.sh"
   publish = "."
 
-[build.environment]
-  # Set these in Netlify dashboard under Site settings > Environment variables
-  FIREBASE_API_KEY = ""
-  FIREBASE_AUTH_DOMAIN = ""
-  FIREBASE_DATABASE_URL = ""
-  FIREBASE_PROJECT_ID = ""
-  FIREBASE_STORAGE_BUCKET = ""
-  FIREBASE_MESSAGING_SENDER_ID = ""
-  FIREBASE_APP_ID = ""
+# Environment variables are set in Netlify dashboard under Site settings > Environment variables
+# DO NOT declare them here with empty values as it overrides the dashboard settings
 
 [[headers]]
   for = "/*"
