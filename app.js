@@ -83,7 +83,7 @@ class URLListApp {
         this.currentPage = 'list';
         
         // Update URL with new room ID
-        history.pushState(null, null, `#room=${this.roomId}`);
+        history.pushState(null, null, `/${this.roomId}`);
         
         // Connect to Firebase
         this.connectToFirebase();
@@ -106,8 +106,8 @@ class URLListApp {
         }
         this.roomId = null;
         
-        // Clear URL hash
-        history.pushState(null, null, window.location.pathname);
+        // Navigate to home
+        history.pushState(null, null, '/');
         this.updateView();
     }
 
@@ -236,12 +236,23 @@ class URLListApp {
     }
 
     loadFromURL() {
+        const pathname = window.location.pathname;
         const hash = window.location.hash;
         
-        // Check for Firebase room ID
+        // Check for clean path-based room ID (e.g., /abc123)
+        if (pathname.length > 1) {
+            this.roomId = pathname.substring(1); // Remove leading '/'
+            this.currentPage = 'list';
+            this.connectToFirebase();
+            return;
+        }
+        
+        // Legacy support for hash-based room ID
         if (hash.startsWith('#room=')) {
             this.roomId = hash.substring(6); // Remove '#room='
             this.currentPage = 'list';
+            // Migrate to clean URL
+            history.replaceState(null, null, `/${this.roomId}`);
             this.connectToFirebase();
             return;
         }
@@ -310,7 +321,7 @@ class URLListApp {
             // Create new Firebase room and redirect
             this.roomId = this.generateId();
             this.currentPage = 'list';
-            history.replaceState(null, null, `#room=${this.roomId}`);
+            history.replaceState(null, null, `/${this.roomId}`);
             
             this.connectToFirebase();
             
