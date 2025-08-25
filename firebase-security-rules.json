@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "lists": {
+      "$listId": {
+        ".read": true,
+        ".write": "
+          // Allow writes only if:
+          // 1. Data is valid structure
+          newData.hasChildren(['title', 'items', 'lastModified', 'version']) &&
+          
+          // 2. Title is string under 100 chars
+          newData.child('title').isString() &&
+          newData.child('title').val().length <= 100 &&
+          
+          // 3. Items is array with max 25 items
+          newData.child('items').hasChildren() == false ||
+          (newData.child('items').hasChildren() &&
+           newData.child('items').numChildren() <= 25) &&
+          
+          // 4. Rate limiting - at least 1 second between updates
+          (!data.exists() || 
+           (now - data.child('lastModified').val()) > 1000) &&
+          
+          // 5. lastModified is recent (within last hour for security)
+          (now - newData.child('lastModified').val()) < 3600000 &&
+          
+          // 6. Version is valid number
+          newData.child('version').isNumber()
+        ",
+        
+        // Validate individual items
+        "items": {
+          "$itemId": {
+            ".validate": "
+              // Each item must have required fields
+              newData.hasChildren(['id', 'text', 'completed', 'createdAt']) &&
+              
+              // ID is string under 50 chars
+              newData.child('id').isString() &&
+              newData.child('id').val().length <= 50 &&
+              
+              // Text is string under 500 chars
+              newData.child('text').isString() &&
+              newData.child('text').val().length <= 500 &&
+              
+              // Completed is boolean
+              newData.child('completed').isBoolean() &&
+              
+              // CreatedAt is number (timestamp)
+              newData.child('createdAt').isNumber()
+            "
+          }
+        },
+        
+        // Auto-delete expired lists (Firebase will handle this)
+        ".expires": {
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}

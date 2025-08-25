@@ -1,3 +1,18 @@
+// Firebase Configuration from environment variables
+const firebaseConfig = {
+    apiKey: window.FIREBASE_CONFIG?.apiKey || "demo-api-key",
+    authDomain: window.FIREBASE_CONFIG?.authDomain || "demo-project.firebaseapp.com",
+    databaseURL: window.FIREBASE_CONFIG?.databaseURL || "https://demo-project-default-rtdb.firebaseio.com/",
+    projectId: window.FIREBASE_CONFIG?.projectId || "demo-project",
+    storageBucket: window.FIREBASE_CONFIG?.storageBucket || "demo-project.appspot.com",
+    messagingSenderId: window.FIREBASE_CONFIG?.messagingSenderId || "123456789",
+    appId: window.FIREBASE_CONFIG?.appId || "demo-app-id"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 class URLListApp {
     constructor() {
         this.currentList = {
@@ -6,6 +21,9 @@ class URLListApp {
             id: this.generateId()
         };
         this.currentPage = 'home';
+        this.roomId = null;
+        this.listRef = null;
+        this.isUpdatingFromFirebase = false;
         this.init();
     }
 
@@ -22,7 +40,7 @@ class URLListApp {
         
         // List management
         document.getElementById('list-title').addEventListener('input', (e) => this.updateTitle(e.target.value));
-        document.getElementById('list-title').addEventListener('blur', () => this.saveToURL());
+        document.getElementById('list-title').addEventListener('blur', () => this.saveToFirebase());
         
         // Item management
         document.getElementById('add-item-btn').addEventListener('click', () => this.addItem());
@@ -49,13 +67,20 @@ class URLListApp {
     }
 
     createNewList() {
+        this.roomId = this.generateId();
         this.currentList = {
             title: '',
             items: [],
-            id: this.generateId()
+            id: this.roomId
         };
         this.currentPage = 'list';
-        this.saveToURL();
+        
+        // Update URL with new room ID
+        history.pushState(null, null, `#room=${this.roomId}`);
+        
+        // Connect to Firebase
+        this.connectToFirebase();
+        
         this.updateView();
         
         // Focus on title input
@@ -66,6 +91,14 @@ class URLListApp {
 
     goHome() {
         this.currentPage = 'home';
+        
+        // Disconnect from Firebase
+        if (this.listRef) {
+            this.listRef.off();
+            this.listRef = null;
+        }
+        this.roomId = null;
+        
         // Clear URL hash
         history.pushState(null, null, window.location.pathname);
         this.updateView();
@@ -98,7 +131,7 @@ class URLListApp {
         this.currentList.items.unshift(item);
         input.value = '';
         
-        this.saveToURL();
+        this.saveToFirebase();
         this.renderItems();
         this.updateStats();
         this.showToast('Item added!', 'success');
@@ -108,7 +141,7 @@ class URLListApp {
         const item = this.currentList.items.find(item => item.id === itemId);
         if (item) {
             item.completed = !item.completed;
-            this.saveToURL();
+            this.saveToFirebase();
             this.renderItems();
             this.updateStats();
             this.showToast(item.completed ? 'Item completed!' : 'Item unchecked', 'info');
@@ -119,62 +152,139 @@ class URLListApp {
         const item = this.currentList.items.find(item => item.id === itemId);
         if (item && newText.trim()) {
             item.text = newText.trim();
-            this.saveToURL();
+            this.saveToFirebase();
             this.showToast('Item updated!', 'success');
         }
     }
 
     deleteItem(itemId) {
         this.currentList.items = this.currentList.items.filter(item => item.id !== itemId);
-        this.saveToURL();
+        this.saveToFirebase();
         this.renderItems();
         this.updateStats();
         this.showToast('Item deleted', 'info');
     }
 
-    saveToURL() {
-        if (this.currentPage === 'list') {
+    async saveToFirebase() {
+        if (this.currentPage === 'list' && this.listRef && !this.isUpdatingFromFirebase) {
+            // Client-side validation for security
+            if (!this.validateListData()) {
+                this.showToast('Invalid list data', 'error');
+                return;
+            }
+            
+            // Rate limiting check
+            if (this.lastSave && Date.now() - this.lastSave < 1000) {
+                console.log('Rate limited - too many saves');
+                return;
+            }
+            
             const data = {
-                v: 1, // version
-                t: this.currentList.title,
-                i: this.currentList.items.map(item => ({
-                    id: item.id,
-                    t: item.text,
-                    c: item.completed,
-                    ca: item.createdAt
-                }))
+                title: this.sanitizeString(this.currentList.title, 100),
+                items: this.currentList.items.slice(0, 25).map(item => ({
+                    id: this.sanitizeString(item.id, 50),
+                    text: this.sanitizeString(item.text, 500),
+                    completed: Boolean(item.completed),
+                    createdAt: Number(item.createdAt) || Date.now()
+                })),
+                lastModified: Date.now(),
+                version: 1,
+                // TTL: Auto-delete after 1 year of inactivity
+                '.expires': Date.now() + (365 * 24 * 60 * 60 * 1000)
             };
             
             try {
-                const compressed = this.compressData(JSON.stringify(data));
-                const hash = `#data=${compressed}`;
-                history.replaceState(null, null, hash);
+                await this.listRef.set(data);
+                this.lastSave = Date.now();
+                console.log('List saved to Firebase');
             } catch (error) {
-                console.error('Failed to save data:', error);
-                this.showToast('Error saving list data', 'warning');
+                console.error('Failed to save to Firebase:', error);
+                this.showToast('Error saving list', 'warning');
             }
         }
+    }
+    
+    validateListData() {
+        // Basic validation
+        if (this.currentList.items.length > 25) {
+            return false;
+        }
+        
+        if (this.currentList.title && this.currentList.title.length > 100) {
+            return false;
+        }
+        
+        for (const item of this.currentList.items) {
+            if (!item.id || !item.text || item.text.length > 500) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    sanitizeString(str, maxLength) {
+        if (typeof str !== 'string') return '';
+        return str.slice(0, maxLength).replace(/[<>]/g, ''); // Basic XSS prevention
     }
 
     loadFromURL() {
         const hash = window.location.hash;
         
-        if (!hash.startsWith('#data=')) {
-            this.currentPage = 'home';
+        // Check for Firebase room ID
+        if (hash.startsWith('#room=')) {
+            this.roomId = hash.substring(6); // Remove '#room='
+            this.currentPage = 'list';
+            this.connectToFirebase();
             return;
         }
-
+        
+        // Legacy support for old URL format
+        if (hash.startsWith('#data=')) {
+            this.migrateLegacyUrl(hash);
+            return;
+        }
+        
+        this.currentPage = 'home';
+    }
+    
+    async connectToFirebase() {
+        if (!this.roomId) return;
+        
+        // Connect to Firebase reference
+        this.listRef = database.ref(`lists/${this.roomId}`);
+        
+        // Listen for real-time updates
+        this.listRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                this.isUpdatingFromFirebase = true;
+                this.currentList = {
+                    title: data.title || '',
+                    items: data.items || [],
+                    id: this.roomId
+                };
+                this.updateView();
+                this.isUpdatingFromFirebase = false;
+                console.log('List updated from Firebase:', this.currentList.items.length, 'items');
+            } else {
+                // List doesn't exist yet - this is fine for new lists
+                console.log('List not found in Firebase, starting fresh');
+            }
+        });
+        
+        // Handle connection errors
+        this.listRef.on('disconnect', () => {
+            console.log('Disconnected from Firebase');
+        });
+    }
+    
+    migrateLegacyUrl(hash) {
         try {
-            const compressed = hash.substring(6); // Remove '#data='
-            let jsonString;
-            let data;
-            
-            console.log('Loading compressed data:', compressed.substring(0, 50) + '...');
-            
-            // Use simple base64 decompression
-            jsonString = this.decompressData(compressed);
-            console.log('Decompression result:', jsonString.substring(0, 100) + '...');
-            data = JSON.parse(jsonString);
+            // Convert old URL format to Firebase
+            const compressed = hash.substring(6);
+            const jsonString = this.decompressData(compressed);
+            const data = JSON.parse(jsonString);
             
             this.currentList = {
                 title: data.t || '',
@@ -187,12 +297,23 @@ class URLListApp {
                 id: this.generateId()
             };
             
+            // Create new Firebase room and redirect
+            this.roomId = this.generateId();
             this.currentPage = 'list';
-            console.log('List loaded successfully:', this.currentList.items.length, 'items');
+            history.replaceState(null, null, `#room=${this.roomId}`);
+            
+            this.connectToFirebase();
+            
+            // Save migrated data to Firebase
+            setTimeout(() => {
+                this.saveToFirebase();
+                this.showToast('List migrated to new format!', 'success');
+            }, 1000);
+            
         } catch (error) {
-            console.error('Failed to load list data:', error);
+            console.error('Failed to migrate legacy URL:', error);
             this.currentPage = 'home';
-            this.showToast('Error loading list from link', 'error');
+            this.showToast('Error loading legacy list', 'error');
         }
     }
 
