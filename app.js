@@ -11,11 +11,8 @@ const firebaseConfig = {
 
 // Initialize Firebase with error handling
 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.error('Firebase configuration missing! Check that firebase-config.js loaded properly.');
-    console.error('Config received:', firebaseConfig);
 } else {
     firebase.initializeApp(firebaseConfig);
-    console.log('Firebase initialized successfully with project:', firebaseConfig.projectId);
 }
 
 const database = firebase.database();
@@ -182,7 +179,6 @@ class URLListApp {
             
             // Rate limiting check
             if (this.lastSave && Date.now() - this.lastSave < 1000) {
-                console.log('Rate limited - too many saves');
                 return;
             }
             
@@ -203,9 +199,7 @@ class URLListApp {
             try {
                 await this.listRef.set(data);
                 this.lastSave = Date.now();
-                console.log('List saved to Firebase');
             } catch (error) {
-                console.error('Failed to save to Firebase:', error);
                 this.showToast('Error saving list', 'warning');
             }
         }
@@ -284,10 +278,8 @@ class URLListApp {
                 };
                 this.updateView();
                 this.isUpdatingFromFirebase = false;
-                console.log('List updated from Firebase:', this.currentList.items.length, 'items');
             } else {
                 // List doesn't exist yet - this is fine for new lists
-                console.log('List not found in Firebase, starting fresh');
             }
         });
         
@@ -295,7 +287,6 @@ class URLListApp {
         const connectedRef = database.ref('.info/connected');
         connectedRef.on('value', (snapshot) => {
             if (snapshot.val() === false) {
-                console.log('Disconnected from Firebase');
             }
         });
     }
@@ -332,7 +323,6 @@ class URLListApp {
             }, 1000);
             
         } catch (error) {
-            console.error('Failed to migrate legacy URL:', error);
             this.currentPage = 'home';
             this.showToast('Error loading legacy list', 'error');
         }
