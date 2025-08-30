@@ -133,7 +133,7 @@ class URLListApp {
             createdAt: Date.now()
         };
 
-        this.currentList.items.unshift(item);
+        this.currentList.items.push(item);
         input.value = '';
         
         this.saveToFirebase();
