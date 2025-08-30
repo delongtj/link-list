@@ -68,13 +68,34 @@
         background: var(--gray-50) !important;
     }
     
-    /* Override white backgrounds to dark */
+    /* Override ALL white backgrounds to dark */
     .list-item {
         background: var(--gray-100) !important;
     }
     
     .footer {
         background: var(--gray-100) !important;
+    }
+    
+    /* Fix the add item section white background */
+    .add-item-section {
+        background: var(--gray-100) !important;
+    }
+    
+    .add-item-input {
+        background: var(--gray-200) !important;
+        color: var(--gray-900) !important;
+        border: 1px solid var(--gray-300) !important;
+    }
+    
+    .add-item-input::placeholder {
+        color: var(--gray-500) !important;
+    }
+    
+    /* Fix any other white backgrounds */
+    .item-checkbox {
+        background: var(--gray-200) !important;
+        border-color: var(--gray-400) !important;
     }
 }
 
