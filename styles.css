@@ -215,6 +215,9 @@ body {
     color: var(--gray-900);
     padding: 0.5rem 0;
     outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .list-title-input::placeholder {
@@ -225,6 +228,9 @@ body {
     background: var(--gray-50);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .share-button {
@@ -369,12 +375,18 @@ body {
     padding: 0.25rem 0;
     outline: none;
     transition: var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .item-text:focus {
     background: var(--gray-50);
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .list-item.completed .item-text {
@@ -700,18 +712,26 @@ body {
     
     .list-header-content {
         padding: 0 1rem;
+        gap: 0.75rem;
     }
     
     .list-title-input {
         font-size: 1.25rem;
+        min-width: 0; /* Allow title to shrink */
     }
     
     .share-button {
         padding: 0.75rem;
+        min-width: 44px; /* Minimum touch target */
+        flex-shrink: 0; /* Don't let button shrink */
     }
     
     .share-button span {
         display: none;
+    }
+    
+    .icon-button {
+        flex-shrink: 0; /* Don't let back button shrink */
     }
     
     .add-item-container {
