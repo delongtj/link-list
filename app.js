@@ -111,6 +111,7 @@ class URLListApp {
     updateTitle(title) {
         this.currentList.title = title;
         this.updateStats();
+        this.updatePageMetadata();
     }
 
     addItem() {
@@ -783,7 +784,69 @@ class URLListApp {
             this.renderItems();
             this.updateStats();
             this.checkWarningDismissal();
+            this.updatePageMetadata();
+        } else {
+            this.resetPageMetadata();
         }
+    }
+
+    updatePageMetadata() {
+        const listTitle = this.currentList.title || 'Untitled List';
+        const itemCount = this.currentList.items.length;
+        const completedCount = this.currentList.items.filter(item => item.completed).length;
+        
+        const pageTitle = `${listTitle} - LinkList`;
+        const description = `Collaborative list "${listTitle}" with ${itemCount} items (${completedCount} completed). Share this link to collaborate instantly!`;
+        const currentUrl = window.location.href;
+        
+        // Update page title
+        document.title = pageTitle;
+        
+        // Update meta description
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.content = description;
+        
+        // Update Open Graph tags
+        let ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.content = pageTitle;
+        
+        let ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.content = description;
+        
+        let ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.content = currentUrl;
+        
+        // Update Twitter tags
+        let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twitterTitle) twitterTitle.content = pageTitle;
+        
+        let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+        if (twitterDesc) twitterDesc.content = description;
+    }
+
+    resetPageMetadata() {
+        // Reset to default homepage metadata
+        document.title = 'LinkList - Instant Collaborative Lists';
+        
+        const defaultDesc = 'Create and share collaborative lists instantly - no accounts, no apps, no hassle. Perfect for shopping lists, checklists, and quick collaboration.';
+        
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.content = defaultDesc;
+        
+        let ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.content = 'LinkList - Instant Collaborative Lists';
+        
+        let ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.content = defaultDesc;
+        
+        let ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.content = 'https://lnklst.netlify.app';
+        
+        let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twitterTitle) twitterTitle.content = 'LinkList - Instant Collaborative Lists';
+        
+        let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+        if (twitterDesc) twitterDesc.content = defaultDesc;
     }
 
     renderItems() {
