@@ -406,6 +406,49 @@ body {
     color: white;
 }
 
+/* Reorder buttons */
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reorder-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.list-item:hover .reorder-buttons {
+    opacity: 1;
+}
+
+.reorder-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.reorder-btn:hover:not(.disabled) {
+    background: var(--primary);
+    color: white;
+}
+
+.reorder-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 /* Empty state */
 .empty-state {
     text-align: center;
