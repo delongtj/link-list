@@ -39,30 +39,42 @@
 /* Dark mode colors */
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Update grays for dark mode */
-        --gray-50: #0f172a;
-        --gray-100: #1e293b;
-        --gray-200: #334155;
-        --gray-300: #475569;
-        --gray-400: #64748b;
-        --gray-500: #94a3b8;
-        --gray-600: #cbd5e1;
-        --gray-700: #e2e8f0;
-        --gray-800: #f1f5f9;
-        --gray-900: #f8fafc;
+        /* True dark mode colors */
+        --gray-50: #1a1a1a;   /* Dark charcoal background */
+        --gray-100: #2d2d2d;  /* Slightly lighter charcoal */
+        --gray-200: #404040;  /* Medium charcoal */
+        --gray-300: #525252;  /* Lighter charcoal borders */
+        --gray-400: #737373;  /* Muted text */
+        --gray-500: #a3a3a3;  /* Secondary text */
+        --gray-600: #d4d4d4;  /* Primary text */
+        --gray-700: #e5e5e5;  /* High contrast text */
+        --gray-800: #f5f5f5;  /* Headers */
+        --gray-900: #ffffff;  /* Pure white text */
         
-        /* Adjust primary colors for better dark mode contrast */
+        /* Adjust primary colors for dark mode */
         --primary: #3b82f6;
         --primary-dark: #2563eb;
         --primary-light: #60a5fa;
         
-        /* Update shadows for dark mode */
-        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        /* Dark mode shadows */
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+        
+        /* Override secondary to dark */
+        --secondary: #2d2d2d;
     }
     
     body {
-        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        background: var(--gray-50) !important;
+    }
+    
+    /* Override white backgrounds to dark */
+    .list-item {
+        background: var(--gray-100) !important;
+    }
+    
+    .footer {
+        background: var(--gray-100) !important;
     }
 }
 
